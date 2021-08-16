@@ -66,7 +66,7 @@ In run_pipeline_[PROJECT_NAME].sh set parameters:
 * feather
   * 1 if you want to run feather part. 0 if not. You want this set to 0 if you have already ran feather for this dataset and need to run MAPS only. Otherwise set it to 1. If you are running MAPS on merged datasets, feather must be set to 1
 * maps
-  * 1 if you want to run MAPS past. 0 if not. By setting this to 0, you ran mapping and prefiltering (outputs are .bedpe and .bed files), but not binning or peak calling.
+  * 1 if you want to run MAPS part. 0 if not. By setting this to 0, you ran mapping and prefiltering (outputs are .bedpe and .bed files), but not binning or peak calling.
 * number_of_datasets
   * Number of biological replicas. Can be 1,2, … N. If set to 1, script assumes that user is running MAPS for a particular biological replica. If number_of_datasets is larger than 1, script assumes that user is running MAPS on merged data, and it will look for .bedpe and .bed files of each replica defined in dataset1, dataset2,..., datasetN lines (See below)
 * dataset_name
