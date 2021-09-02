@@ -13,6 +13,7 @@ macs2_filepath="/home/jurici/MAPS/PLAC-Seq_datasets/GM12878/MACS2_peaks/ENCFF686
 organism="hg19"
 bwa_index=""
 bin_size=5000
+binning_range=1000000
 fdr=2
 filter_file="None"
 generate_hic=1
