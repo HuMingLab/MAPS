@@ -84,6 +84,7 @@ def split_main(input_bam, outdir, prefix, cutoff, per_chr, generate_hic, chip_pe
 	prev = pysam.AlignedSegment()
 	prev.query_name = ""
 	shrt_count = 0
+	intra_all_count = 0
 	short_inter_count = 0
 	shrt_vip_count = 0
 	long_intra_count = 0
@@ -105,22 +106,26 @@ def split_main(input_bam, outdir, prefix, cutoff, per_chr, generate_hic, chip_pe
 		pos2 = read.reference_end if read.is_reverse else read.reference_start
 
 		is_intra, is_short, is_vip, is_auto = classify_reads(read, prev, autosomal_chrs, cutoff)
-		if is_intra and is_auto and (not is_short): #intra-chromosomal long autosomal
-			long_autosomal_intra_count += 1
-			if (per_chr):
-				long_intra_bam_files[read.reference_name].write(read)
-			if (abs(read.template_length) <= 1000000):
-				long_filtered_count += 1
-			fout_long_intra.write(read)
+		if is_intra:
+			intra_all_count += 1
+		if is_intra and not is_short:
 			long_intra_count += 1
+			if is_auto and (not is_short): #intra-chromosomal long autosomal
+				long_autosomal_intra_count += 1
+				if (per_chr):
+					long_intra_bam_files[read.reference_name].write(read)
+				if (abs(read.template_length) <= 1000000):
+					long_filtered_count += 1
+				fout_long_intra.write(read)
 		if (not is_intra): #inter-chromosomal autosomal reads
 			long_inter_count += 1
 			if is_auto:
 				fout_long_inter.write(read)
 		if (is_short and is_intra): #short reads
+			shrt_count += 1
 			if is_auto: # write to bam file
 				fout_shrt.write(read)
-				shrt_count += 1
+				short_autosomal_count += 1
 			if is_vip and is_auto and pos1 != pos2: #short vip reads
 				if read_num % 2 == 1:
 					chrom = prev.reference_name
@@ -201,8 +206,9 @@ def split_main(input_bam, outdir, prefix, cutoff, per_chr, generate_hic, chip_pe
 	long_filtered_count /= 2
 	short_inter_count /= 2
 	long_inter_count /= 2
+	intra_all_count /= 2
 	#inter_all_count = short_inter_count + long_inter_count
-	intra_all_count = shrt_count + long_intra_count
+	#intra_all_count = shrt_count + long_intra_count
 	if (flagstat_filename):
 		with open(flagstat_filename) as flag_file:
 			lines = flag_file.readlines()
@@ -230,14 +236,24 @@ def split_main(input_bam, outdir, prefix, cutoff, per_chr, generate_hic, chip_pe
 	with open(qc_filename, 'a') as outfile:
 		outfile.write("{0:70} {1} ".format("number of intrachromosomal pairs", str(int(intra_all_count))))
 		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(intra_all_count)) / int(float(read_count))))
-		outfile.write("{0:70} {1} ".format("number of short-range intrachromosomal pairs", str(int(shrt_count))))
-		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(shrt_count)) / int(float(read_count))))
-		#outfile.write("{0:70} {1} ".format("number of short-range intrachromosomal autosomal pairs", str(int(short_autosomal_count))))
-		#outfile.write("\t({0:.2f}%)\n".format(100 * int(float(short_autosomal_count)) / int(float(read_count))))
-		outfile.write("{0:70} {1} ".format("number of short-range vip pairs", str(int(shrt_vip_count))))
-		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(shrt_vip_count)) / int(float(read_count))))
+		
+		##newly added
 		outfile.write("{0:70} {1} ".format("number of long-range intrachromosomal pairs", str(int(long_intra_count))))
 		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(long_intra_count)) / int(float(read_count))))
+
+		outfile.write("{0:70} {1} ".format("number of long-range intrachromosomal autosomal (+X,Y) pairs", str(int(long_autosomal_intra_count))))
+		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(long_autosomal_intra_count)) / int(float(read_count))))
+
+		outfile.write("{0:70} {1} ".format("number of short-range intrachromosomal pairs", str(int(shrt_count))))
+		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(shrt_count)) / int(float(read_count))))
+		#newly added end
+
+		outfile.write("{0:70} {1} ".format("number of short-range intrachromosomal autosomal (+X,Y) pairs", str(int(short_autosomal_count))))
+		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(short_autosomal_count)) / int(float(read_count))))
+		#outfile.write("{0:70} {1} ".format("number of short-range intrachromosomal autosomal pairs", str(int(short_autosomal_count))))
+		#outfile.write("\t({0:.2f}%)\n".format(100 * int(float(short_autosomal_count)) / int(float(read_count))))
+		outfile.write("{0:70} {1} ".format("number of short-range vip (auto+X+Y) pairs", str(int(shrt_vip_count))))
+		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(shrt_vip_count)) / int(float(read_count))))
 		outfile.write("{0:70} {1} ".format("number of interchromosomal pairs", str(int(long_inter_count))))
 		outfile.write("\t({0:.2f}%)\n".format(100 * int(float(long_inter_count)) / int(float(read_count))))
 		#outfile.write("{0:70} {1} ".format("number of long-range autosomal intra-chromosomal pairs", str(int(long_autosomal_intra_count))))

@@ -2,9 +2,11 @@ fastq_all
 mapped
 not_duplicated
 intra_all
-short_all
-short_final
 long_intra
+long_intra_auto_XY
+short_intra
+short_intra_auto_XY
+short_vip
 inter_all
 trans_ratio
 long_cis_ratio
