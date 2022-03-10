@@ -1,4 +1,4 @@
-![alt text](https://arimagenomics.com/public/images/header-logo.png "Celebrating Science and Scientist")
+![alt text](https://arimagenomics.com/wp-content/files/2021/08/Arima-Genomics-logo.png "Celebrating Science and Scientist")
 
 
 # MAPS Pipeline for Arima-HiChIP with Arima-HiC<sup>+</sup> Kit
@@ -75,7 +75,7 @@ Please move Arima-MAPS_v2.0.sh from MAPS/Arima_Genomics/ directory to "MAPS/bin/
 
 ### Dependencies
 
-#### GCC Compiler (including gcc, g++ and make)
+#### GCC Compiler (including gcc, g++ and make)
 
 ```
 sudo apt update
@@ -356,4 +356,3 @@ For Arima customer support, please contact techsupport@arimagenomics.com
 ## Acknowledgments
 
 Thank you to Ming Hu, Armen Abnousi, and Ivan Juric for collaborating with us on this pipeline and for hosting it on their GitHub page.
-
