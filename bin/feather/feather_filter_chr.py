@@ -82,9 +82,12 @@ def filter_main(fastq1, fastq2, bwa_index, mapq, outdir, prefix, threads, optica
 	proc.communicate()
 	with open(paired_filename + ".rmdup.flagstat") as flag_file:
 		lines = flag_file.readlines()
-		duprmd_count = lines[7].split()[0]
-		intra_count = lines[11].split()[0]
-		intra_count = str(int(float(intra_count)) / 2)
+	for line in lines:
+		if "read1" in line:
+			duprmd_count = line.split()[0]
+		if "with mate mapped to a different chr\n" in line:
+			intra_count = line.split()[0]
+			intra_count = str(int(float(intra_count)) / 2)
 	print(time.ctime() + " calling samtools sort for sorting by query names")
 	#pysam.sort("-n", "-o", bwa_filename + ".srtn.rmdup.bam", paired_filename + ".rmdup.bam")
 	pysam.sort("-o", paired_filename + ".srtn.rmdup.bam", 

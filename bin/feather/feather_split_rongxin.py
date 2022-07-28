@@ -212,9 +212,11 @@ def split_main(input_bam, outdir, prefix, cutoff, per_chr, generate_hic, chip_pe
 	if (flagstat_filename):
 		with open(flagstat_filename) as flag_file:
 			lines = flag_file.readlines()
-			duprmd_count = int(lines[7].split()[0])
-			trans_ratio = long_inter_count / duprmd_count
-			long_cis_ratio = long_intra_count / intra_all_count
+		for line in lines:
+			if "read1" in line:
+				duprmd_count = int(line.split()[0])
+		trans_ratio = long_inter_count / duprmd_count
+		long_cis_ratio = long_intra_count / intra_all_count
 	else:
 		trans_ratio, long_cis_ratio = -1, -1
 	if (chip_peaks):
